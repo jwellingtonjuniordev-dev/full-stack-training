@@ -15,19 +15,21 @@ const listaDeDespesas: Transacao[] = [
 
 function Dashboard() {
   const [transacoes, setTransacoes] = useState<Transacao[]>(listaDeDespesas);
+  const [novaDescricao, setNovaDescricao] = useState<string>("");
+  const [tipo, novoTipo] = useState<"entrada" | "saida">("entrada");
+  const [valor, novoValor] = useState<number>(0);
 
-  // Mover a lógica para dentro do componente facilita a manutenção
   function lidarComAdicao() {
-    // Tipamos o objeto explicitamente para garantir segurança
     const novaTransacao: Transacao = { 
-      id: transacoes.length + 1, // ID dinâmico simples
-      descricao: "Freelance", 
-      valor: 500, 
-      tipo: "entrada" 
+      id: transacoes.length + 1,
+      descricao: novaDescricao, 
+      valor: valor, 
+      tipo: tipo 
     };
-
-    // Atualiza o estado usando a imutabilidade
     setTransacoes([...transacoes, novaTransacao]);
+    setNovaDescricao(""); // Limpa o campo de descrição após adicionar a transação
+    novoTipo("entrada"); // Reseta o tipo para "entrada"
+    novoValor(0); // Reseta o valor para 0
   }
 
   const calculoDeRendimento = transacoes
@@ -38,9 +40,35 @@ function Dashboard() {
   return (
     <div>
       <h1>Dashboard</h1>
-      <p>Rendimento total: {calculoDeRendimento}</p>
+      <p>Rendimento total: {calculoDeRendimento.toFixed(2)}€</p>
       
-      {/* Passamos apenas a referência da função, deixando o HTML muito mais limpo */}
+      <ul>
+        {transacoes.map((item) => (
+          <li key={item.id} style={{ color: item.tipo === "entrada" ? "green" : "red" }}>
+            {item.descricao} - {item.valor}€
+          </li>
+        ))}
+      </ul>
+
+      <input 
+        type="text" 
+        placeholder="Descrição da transação" 
+        value={novaDescricao} 
+        onChange={(e) => setNovaDescricao(e.target.value)} 
+      />
+
+      <select value={tipo} onChange={(e) => novoTipo(e.target.value as "entrada" | "saida")}>
+        <option value="entrada">Entrada</option>
+        <option value="saida">Saída</option>
+      </select>
+
+      <input 
+        type="number" 
+        placeholder="Valor da transação" 
+        value={valor} 
+        onChange={(e) => novoValor(parseFloat(e.target.value))} 
+      />
+      
       <button onClick={lidarComAdicao}>
         Adicionar Transação
       </button>
